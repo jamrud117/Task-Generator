@@ -10,31 +10,19 @@ function generateTasks() {
   const lines = text.split("\n");
   tasks = [];
 
-  // Cari tanggal
-  const dateMatch = text.match(
-    /(Senin|Selasa|Rabu|Kamis|Jumat|Sabtu|Minggu)\s+\d{2}-\d{2}-\d{4}/i
-  );
-
-  // Update tanggal hanya jika ditemukan tanggal baru
-  if (dateMatch) {
-    currentDate = dateMatch[0];
-  }
-
-  document.getElementById("dateHeader").textContent = currentDate
-    ? "📅 " + currentDate
-    : "";
-
   // Ambil task berdasarkan numbering
   lines.forEach((line) => {
     const match = line.match(/^\s*\d+\.\s*(.+)/);
     if (match) {
       const content = match[1];
-      const titleMatch = content.match(/(PT.*?)(?=\s*-)/i);
-      const descMatch = content.match(/-\s*(.+)/);
+      const parts = content.split(/\s*-\s*/);
+
+      const title = parts[0]?.trim() || "Tanpa Judul";
+      const description = parts[1]?.trim() || "";
 
       tasks.push({
-        title: titleMatch ? titleMatch[1].trim() : "Tanpa Judul",
-        description: descMatch ? descMatch[1].trim() : "",
+        title: title,
+        description: description,
         done: false,
       });
     }
@@ -132,25 +120,31 @@ function updateStats() {
 ========================= */
 function saveTasks() {
   localStorage.setItem("taskData", JSON.stringify(tasks));
-  localStorage.setItem("taskDate", currentDate);
   localStorage.setItem(
     "generatorText",
-    document.getElementById("inputText").value
+    document.getElementById("inputText").value,
   );
+}
+
+function getTodayFormatted() {
+  const today = new Date();
+
+  const hari = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+
+  const dayName = hari[today.getDay()];
+  const day = String(today.getDate()).padStart(2, "0");
+  const month = String(today.getMonth() + 1).padStart(2, "0");
+  const year = today.getFullYear();
+
+  return `${dayName} ${day}-${month}-${year}`;
 }
 
 function loadTasks() {
   const savedTasks = localStorage.getItem("taskData");
-  const savedDate = localStorage.getItem("taskDate");
   const savedText = localStorage.getItem("generatorText");
 
   if (savedTasks) {
     tasks = JSON.parse(savedTasks);
-  }
-
-  if (savedDate) {
-    currentDate = savedDate;
-    document.getElementById("dateHeader").textContent = "📅 " + currentDate;
   }
 
   if (savedText) {
@@ -255,6 +249,9 @@ function loadDarkMode() {
    INIT
 ========================= */
 document.addEventListener("DOMContentLoaded", function () {
+  currentDate = getTodayFormatted();
+  document.getElementById("dateHeader").textContent = "📅 " + currentDate;
+
   loadTasks();
   loadDarkMode();
   autoNumbering();
