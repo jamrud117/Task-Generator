@@ -122,7 +122,7 @@ function saveTasks() {
   localStorage.setItem("taskData", JSON.stringify(tasks));
   localStorage.setItem(
     "generatorText",
-    document.getElementById("inputText").value,
+    document.getElementById("inputText").value
   );
 }
 
@@ -201,14 +201,12 @@ function resetAll() {
     if (result.isConfirmed) {
       // Kosongkan data
       tasks = [];
-      currentDate = "";
 
       localStorage.removeItem("taskData");
       localStorage.removeItem("taskDate");
       localStorage.removeItem("generatorText");
 
       document.getElementById("inputText").value = "";
-      document.getElementById("dateHeader").textContent = "";
 
       renderTasks();
 
